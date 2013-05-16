@@ -23,12 +23,15 @@ class TutorialLayer(ColorLayer):
 	DOWN = 65364  
 	LAST_KEY = DOWN
 
+	width = 0
+	height = 0
+
 	def __init__(self):
 		super(TutorialLayer, self).__init__(0,0,100,255)
 
-		x,y = director.get_window_size()
+		width,height = director.get_window_size()
 		self.ship = spaceShip.CreateSpaceShip()
-		self.ship.position = x/2, y/2
+		self.ship.position = self.width/2, self.height/2
 		self.add(self.ship)
 
 		self.chars_pressed = set()
@@ -44,9 +47,6 @@ class TutorialLayer(ColorLayer):
 	def update(self, dt):
 		x,y = self.ship.position
 
-
-
-
 		if LEFT in self.chars_pressed:
 			if self.LAST_KEY != LEFT:
 				self.remove(self.ship)
@@ -61,8 +61,9 @@ class TutorialLayer(ColorLayer):
 				self.ship = spaceShip.changeSpaceState("up")
 				self.add(self.ship)
 			
-			self.LAST_KEY = UP
 			y += 2
+			self.LAST_KEY = UP
+			spaceShip.boostUp()
 		if RIGHT in self.chars_pressed:
 			if self.LAST_KEY != RIGHT:
 				self.remove(self.ship)
@@ -76,7 +77,14 @@ class TutorialLayer(ColorLayer):
 				self.ship = spaceShip.changeSpaceState("standart")
 				self.add(self.ship)
 			self.LAST_KEY = DOWN
-			y-= 2
+				
+		#print y, self.height
+		
+		y += spaceShip.getAcceleration()
+		#print y
+		if y < 0:
+			y= self.height-25
+
 		self.ship.position = (x,y)
 
 
